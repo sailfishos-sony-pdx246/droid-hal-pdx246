@@ -1,6 +1,6 @@
 <!--
 SPDX-FileCopyrightText: Johannes Meyer zum Alten Borgloh
-SPDX-License-Identifier: Apache-2.0
+SPDX-License-Identifier: CC-BY-SA-4.0
 -->
 
 # Submodules of droid-hal-pdx246

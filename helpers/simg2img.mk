@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: Johannes Meyer zum Alten Borgloh
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: BSD-3-Clause
 #
 # Builds simg2img for the droid-hal-pdx246-tools package.
 #

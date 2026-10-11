@@ -1,9 +1,13 @@
 # SPDX-FileCopyrightText: Johannes Meyer zum Alten Borgloh
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: BSD-3-Clause
 
 # Copyright and licensing for the files that cannot carry a header themselves.
 # Every other file of this repository has its own SPDX header. The dhd
 # submodule (mer-hybris/droid-hal-device) is upstream's and not covered here.
+#
+# Licences follow the code this builds on: BSD-3-Clause like dhd (its RPM tag
+# `License: BSD`), the documentation (README.md, NOTES.md, SUBMODULES.md)
+# CC-BY-SA-4.0.
 
 version = 1
 SPDX-PackageName = "droid-hal-pdx246"
@@ -13,4 +17,4 @@ SPDX-PackageSupplier = "Johannes Meyer zum Alten Borgloh"
 [[annotations]]
 path = [".gitmodules"]
 SPDX-FileCopyrightText = "Johannes Meyer zum Alten Borgloh"
-SPDX-License-Identifier = "Apache-2.0"
+SPDX-License-Identifier = "BSD-3-Clause"

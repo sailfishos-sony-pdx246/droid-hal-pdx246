@@ -1,6 +1,6 @@
 #!/bin/sh
 # SPDX-FileCopyrightText: Johannes Meyer zum Alten Borgloh
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: BSD-3-Clause
 #
 # Build-time guard and installer for droid-hal-pdx246, run from $ANDROID_ROOT by
 # the spec (custom_build_cmds and custom_install_cmds of dhd's droid-hal-device.inc).

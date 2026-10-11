@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: Johannes Meyer zum Alten Borgloh
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: BSD-3-Clause
 #
 # droid-hal-pdx246: the Sailfish OS droid-hal packages for the Sony Xperia 10 VI
 # (pdx246; XQ-ES54 and XQ-ES72), built from the hybris-23.2 (Android 16) tree.

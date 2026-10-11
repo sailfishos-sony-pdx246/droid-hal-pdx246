@@ -1,6 +1,6 @@
 <!--
 SPDX-FileCopyrightText: Johannes Meyer zum Alten Borgloh
-SPDX-License-Identifier: Apache-2.0
+SPDX-License-Identifier: CC-BY-SA-4.0
 -->
 
 # droid-hal-pdx246: design notes
@@ -563,14 +563,19 @@ and reboot.
 
 | file | origin | licence handling |
 |---|---|---|
-| `droid-hal-pdx246.spec` | new. Macro names and semantics from dhd (`droid-hal-device.inc`, `droid-hal-@DEVICE@.spec.template` @be67bbc); no template text copied. The vendor_dlkm sub-package (`%package vendor_dlkm` to the end) is modelled on dhd be67bbc `droid-hal-device.inc:364-370, 1169-1177, 1327-1332` (RPM boilerplate; dhd `License: BSD`), as an in-file comment says. Values from this analysis; none taken from sharks-dev's spec | SPDX header, Apache-2.0, Johannes Meyer zum Alten Borgloh |
-| `helpers/img2simg.mk`, `helpers/simg2img.mk` | new, rewritten after dhd's `helpers/img2simg.mk` / `helpers/simg2img.mk` (BSD per dhd's RPM tag, no in-file notice) with `-std=gnu++17`; interface (file names, `*_SOURCES` variables, run directory) defined by dhd inc:513-519 and `dhd/helpers/makefile`. The shared part is the make skeleton (`*_SOURCES` default, include flags, object mapping, `-lz`, all/clean), noted in each file | SPDX header, Apache-2.0 |
-| `helpers/matched-set.sh` | new | SPDX header, Apache-2.0 |
-| `README.md`, `NOTES.md`, `SUBMODULES.md` | new | SPDX header (HTML comment), Apache-2.0 |
-| `.gitmodules` | content as `git submodule add` writes it, URL mer-hybris/droid-hal-device | REUSE.toml, Apache-2.0 |
+| `droid-hal-pdx246.spec` | new. Macro names and semantics from dhd (`droid-hal-device.inc`, `droid-hal-@DEVICE@.spec.template` @be67bbc); no template text copied. The vendor_dlkm sub-package (`%package vendor_dlkm` to the end) is modelled on dhd be67bbc `droid-hal-device.inc:364-370, 1169-1177, 1327-1332` (RPM boilerplate; dhd `License: BSD`), as an in-file comment says. Values from this analysis; none taken from sharks-dev's spec | SPDX header, BSD-3-Clause, Johannes Meyer zum Alten Borgloh |
+| `helpers/img2simg.mk`, `helpers/simg2img.mk` | new, rewritten after dhd's `helpers/img2simg.mk` / `helpers/simg2img.mk` (BSD per dhd's RPM tag, no in-file notice) with `-std=gnu++17`; interface (file names, `*_SOURCES` variables, run directory) defined by dhd inc:513-519 and `dhd/helpers/makefile`. The shared part is the make skeleton (`*_SOURCES` default, include flags, object mapping, `-lz`, all/clean), noted in each file | SPDX header, BSD-3-Clause |
+| `helpers/matched-set.sh` | new | SPDX header, BSD-3-Clause |
+| `README.md`, `NOTES.md`, `SUBMODULES.md` | new | SPDX header (HTML comment), CC-BY-SA-4.0 |
+| `.gitmodules` | content as `git submodule add` writes it, URL mer-hybris/droid-hal-device | REUSE.toml, BSD-3-Clause |
 | `REUSE.toml` | new | own SPDX header |
-| `LICENSES/Apache-2.0.txt` | Apache License 2.0 text, copied from `device/sony/pdx246/LICENSES/Apache-2.0.txt` (sha256 074e6e32...615ff) | licence text |
+| `LICENSES/BSD-3-Clause.txt`, `LICENSES/CC-BY-SA-4.0.txt` | licence texts in the form `reuse download` writes them, copied from the LineageOS 23.2 tree (`packages/apps/Aperture/LICENSES/BSD-3-Clause.txt`, identical to SPDX's text; `packages/apps/Twelve/LICENSES/CC-BY-SA-4.0.txt`) | licence texts |
 | `dhd/` (submodule, not part of this repository's own files) | mer-hybris/droid-hal-device @be67bbc | upstream; RPM `License: BSD` (inc:179), helper scripts carry BSD-3-Clause-style headers (Alin Marin Elena, Jolla Ltd., e.g. `helpers/util.sh:1-32`); not modified |
+
+Licences (changed 2026-10-11, the user's decision: each repository takes the
+licence of the official code it builds on): the files written for this port are
+BSD-3-Clause like dhd (they were Apache-2.0 before), the documentation is
+CC-BY-SA-4.0.
 
 The repository text uses placeholders (`$ANDROID_ROOT`, `<sfos>`,
 `<lineageos tree>`) instead of local paths.
