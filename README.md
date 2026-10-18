@@ -198,22 +198,27 @@ known to work with it.
 Upgrading the kernel packages on the phone registers preinit oneshots from
 droid-config-pdx246-flashing: `flash-vendor_boot.sh` and `flash-dtbo.sh` (dhd),
 `flash-bootimg.sh` (img-boot) and `flash-vendor_dlkm.sh` (this spec's
-`-vendor_dlkm`). Untested on the phone; until it is, do kernel updates with the
-fastboot procedure above.
+`-vendor_dlkm`). At the next boot, before anything else runs, the first of them
+writes the whole set and the others find it up to date; then Sailfish OS's
+preinit reboots into the new set. Tested on the phone 2026-10-18 (a kernel
+update and back, `rpm -U` and one `systemctl reboot` each; NOTES.md, D7).
 
-- The first three write `boot_a`, `vendor_boot_a` and `dtbo_a` together as one
-  set, only when the kernel release inside `hybris-boot.img` equals
-  `/boot/vendor_dlkm.release`, and check each written partition. When the set
-  rewrites `vendor_boot_a`, droid-config records the current boot ID in
-  `/var/lib/platform-updates/.pdx246-set-written`.
-- `flash-vendor_dlkm.sh` writes `vendor_dlkm_a` in preinit, before
-  `/vendor_dlkm` is mounted, only when `uname -r` equals
-  `/boot/vendor_dlkm.release` and vendor_boot_a was not rewritten during the current
-  boot. Until then it exits non-zero and stays registered, so vendor_dlkm_a
-  follows at the first boot of the new set. It fails early if the device check
-  (`CPUCHECK_STRING` in the DT model or `/proc/cpuinfo`) fails, and it verifies
-  the written partition against the image.
+- The set is written only when the kernel release inside `hybris-boot.img`
+  equals `/boot/vendor_dlkm.release`, all four images are installed, the phone
+  runs from slot a, the device check (`CPUCHECK_STRING` in the DT model or
+  `/proc/cpuinfo`) passes and the unsparsed vendor_dlkm image fits
+  `vendor_dlkm_a`. Otherwise nothing is written and the job is left as
+  `/etc/oneshot.d/preinit/<name>.failed`.
+- Every partition that differs from its image is written, in the order
+  `vendor_dlkm_a`, `vendor_boot_a`, `dtbo_a`, `boot_a`, and read back. A failed
+  write stops the pass; the set is then mixed and needs the fastboot procedure
+  above. `/var/log/pdx246-platform-updates.log` says what was written.
+- To see what the next boot would write, as root (writes nothing, ~10 s):
+  `env KS_DRY_RUN=1 sh -c '. /var/lib/platform-updates/pdx246-kernel-set.sh; ks_flash_set check'`.
+- `vendor_dlkm_a` must be 96 MiB (the device tree fixes the image size since
+  2026-10-18; flashing a vendor_dlkm.img of such a build from fastbootd sizes
+  it). A phone flashed with an older, smaller image refuses on-device kernel
+  updates until then.
 - droid-hal-pdx246-img-boot requires `-vendor_boot`, `-kernel-dtbo` and
   `-vendor_dlkm` at the same version-release, so the set is installed together.
-- Open before any update channel: img-boot's Release is 1 for every rebuild
-  with the same kernel sublevel (NOTES.md, T12).
+- img-boot's Release changes with every build (NOTES.md, T12).

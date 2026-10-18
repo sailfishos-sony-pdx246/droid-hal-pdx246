@@ -164,50 +164,50 @@ With D3 it would do nothing. The img-boot package registers
 
 ### D7. Kernel updates on the phone (option P)
 
-Decided design; droid-config-pdx246 implements the scripts, its NOTES have the
-details. Untested on the phone (droid-config R11); until then, kernel updates go
-by fastboot (README, Flashing).
+Decided design; droid-config-pdx246 implements the scripts, its NOTES (D21, R11)
+have the details. Tested on the phone 2026-10-18 (droid-config R11): ed8ecc8 ->
+a test kernel -> ed8ecc8, each with `rpm -U` and one `systemctl reboot`. The
+first version (two boots: vendor_dlkm_a deferred to the first boot of the new
+kernel, with a boot ID guard) was replaced before it ever wrote anything,
+because Sailfish OS's preinit never retries a failed oneshot and always reboots
+after the jobs.
 
 - Registration: on upgrade (not at image creation, `$1 -ne 1`) `-kernel-dtbo`
   and `-vendor_boot` (dhd, D5), `-img-boot` (initrd.inc:520-525) and
   `-vendor_dlkm` (this spec) register preinit oneshots from
   droid-config-pdx246-flashing: `flash-dtbo.sh`, `flash-vendor_boot.sh`,
-  `flash-bootimg.sh`, `flash-vendor_dlkm.sh`. A oneshot that exits non-zero
-  stays registered (sailfishos/oneshot `scripts/oneshot`: `$SCRIPTLET && rm`;
-  droid-config NOTES), which closes the former T8.
-- The boot set: the first three call `ks_flash_boot_set`, which writes `boot_a`,
-  `vendor_boot_a` and `dtbo_a` together, only when the kernel release inside
-  `/boot/hybris-boot.img` equals `/boot/vendor_dlkm.release`, and checks each
-  write with `ks_part_matches`. When it rewrites `vendor_boot_a` it writes
-  `/proc/sys/kernel/random/boot_id` to
-  `/var/lib/platform-updates/.pdx246-set-written`.
-- vendor_dlkm: `flash-vendor_dlkm.sh` fails early unless `CPUCHECK_STRING` is
-  found in the DT model or `/proc/cpuinfo`. It exits 1 (stays registered) while
-  `uname -r` differs from `/boot/vendor_dlkm.release`, or while
-  `.pdx246-set-written` holds the current boot ID. Otherwise it maps
-  vendor_dlkm_a from the super metadata (slot a), refuses an image larger than
-  the partition (only fastbootd can resize it), writes it with flash-partition
-  before `/vendor_dlkm` is mounted, and verifies the partition (`simg2img` if
-  the image is sparse, then `cmp` over the image size).
-- Effect, new kernel release: boot N (old kernel) writes the set in preinit;
-  vendor_dlkm waits for the release. Boot N+1 runs the new kernel and
-  vendor_boot and writes vendor_dlkm_a before it is mounted. Effect, a rebuild
-  that changes only the modules (same release, matched-set.sh cannot tell it
-  apart): the boot ID guard defers vendor_dlkm_a to boot N+1 as well. Without
-  it, boot N would mount the new second-stage modules on top of the previous
-  first-stage ones, which the initrd loaded before preinit (hybris-initrd
-  7b972b6 main-init:21-22).
+  `flash-bootimg.sh`, `flash-vendor_dlkm.sh`. `/sbin/preinit`
+  (jolla-sessions-qt5) runs them in `find` order before anything else of the
+  boot: a job that exits 0 is removed, one that exits non-zero becomes
+  `<name>.failed` and is not run again, and afterwards preinit reboots.
+- One pass: each of the four calls `ks_flash_set`. It writes nothing unless the
+  kernel release inside `/boot/hybris-boot.img` equals
+  `/boot/vendor_dlkm.release`, all four images are installed, the phone runs
+  from slot a, `CPUCHECK_STRING` is in the DT model or `/proc/cpuinfo`, and the
+  unsparsed vendor_dlkm image fits vendor_dlkm_a (only fastbootd can resize it).
+  Then it writes every partition that differs from its image, in the order
+  vendor_dlkm_a (through a private read-write dm mapping of its extents in
+  super; the metadata is never written), vendor_boot_a, dtbo_a, boot_a, and
+  verifies each by reading it back. The first job writes, the others find the
+  set up to date. Because preinit reboots before anything mounts
+  `/vendor_dlkm`, the old kernel never loads the new second-stage modules; this
+  also covers a rebuild that changes only the modules and keeps the release.
+- Size: the device tree fixes vendor_dlkm at 96 MiB
+  (`BOARD_VENDOR_DLKMIMAGE_PARTITION_SIZE`, hybris-23.2, 2026-10-18). Before,
+  the image was sized to its content and grew between builds of the same
+  source, while fastbootd sizes vendor_dlkm_a to the image it flashed. With the
+  fixed size vendor_dlkm.img is an Android sparse image; the phone unsparses it
+  with simg2img (`-tools`).
 - Packages: `-vendor_dlkm` requires `-vendor_boot = %{version}-%{release}`.
   droid-hal-pdx246-img-boot requires `-vendor_boot`, `-kernel-dtbo` and
   `-vendor_dlkm` at the version-release of the droid-hal build it packed
   (exact pin in its spec), so img-boot is rebuilt after every `-d` (D16).
 - Not done: a second line in `vendor_dlkm.release` (for example the sha256 of
   vendor_boot.img) to name the build rather than the kernel commit, as the
-  review suggested optionally. droid-config compares the whole file with
-  `uname -r`, so it would need changes there; the boot ID guard covers the
-  modules-only case.
-- Open: img-boot's Release (T12), the order of oneshots within one preinit
-  pass (T8).
+  review suggested optionally. The exact pin in img-boot keeps the set from one
+  build, and the partitions are compared by content, not by release.
+- Resolved: img-boot's Release changes per build since 2026-10-17 (T12); the
+  order of the oneshots within one pass no longer matters (T8).
 
 ### D8. installable_zip: not defined
 

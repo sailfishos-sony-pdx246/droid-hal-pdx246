@@ -142,11 +142,10 @@ set; flash them together.
 
 %post vendor_dlkm
 # Installation at image creation does nothing; the image is flashed with fastboot.
-# On upgrade the new modules must reach vendor_dlkm_a at the first boot of the
-# new set. flash-vendor_dlkm.sh (droid-config-pdx246-flashing) writes only when
-# uname -r equals /boot/vendor_dlkm.release and boot_a, vendor_boot_a and dtbo_a
-# (vendor_boot_a) was not rewritten during the current boot, before vendor_dlkm is mounted, and
-# verifies the write; otherwise it exits non-zero and stays registered. See
+# On upgrade, flash-vendor_dlkm.sh (droid-config-pdx246-flashing) runs in preinit
+# at the next boot: like the other scripts of the set it writes vendor_dlkm_a,
+# vendor_boot_a, dtbo_a and boot_a in that one pass, before vendor_dlkm is
+# mounted, only when they form one matched set, and verifies every write. See
 # NOTES.md of droid-hal-pdx246 (D7).
 if [ $1 -ne 1 ] ; then
   if [ -x /var/lib/platform-updates/flash-vendor_dlkm.sh ] ; then

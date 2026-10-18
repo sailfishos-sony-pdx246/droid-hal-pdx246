@@ -30,8 +30,8 @@
 # (CONFIG_LOCALVERSION_AUTO). Builds of one commit with different uncommitted
 # configs both end in "-dirty", which is reported as a warning; CRCs are not
 # compared. A rebuild that changes only the modules keeps the release; on the
-# phone, droid-config's boot_id guard keeps flash-vendor_dlkm.sh from writing
-# vendor_dlkm_a in the same boot that rewrote vendor_boot_a.
+# phone that is harmless, because droid-config writes the whole set in one
+# preinit pass that reboots before vendor_dlkm is mounted (NOTES.md, D7).
 #
 # Needs: sort, tr, sed, od, head, tail, wc, find, install, lz4 (BuildRequires).
 
